@@ -7,15 +7,20 @@ import { TVShowDetail } from "./components/TVShowDetail/TVShowDetail";
 import { Logo } from "./components/Logo/Logo";
 import logo from "./assets/images/logo.png";
 import { TVShowList } from "./components/TVShowList/TVShowList";
+import { SearchBar } from "./components/SearchBar/SearchBar";
 
 export function App() {
     const [currentTVShow, setCurrentTVShow] = useState();
     const [recommendationList, setRecommendationsList] = useState([]);
 
     async function fetchPopulars() {
-        const populars = await TVShowAPI.fetchPopular();
-        if (populars.length > 0) {
-            setCurrentTVShow(populars[0]);
+        try {
+            const populars = await TVShowAPI.fetchPopular();
+            if (populars.length > 0) {
+                setCurrentTVShow(populars[0]);
+            }
+        } catch (error) {
+            alert("erreur durant la recherche" + error);
         }
     }
 
@@ -36,6 +41,13 @@ export function App() {
         }
     }, [currentTVShow]);
 
+    async function SearchTvShow(tvShowName) {
+        const searchResponse = await TVShowAPI.fetchByTitle(tvShowName);
+        if (searchResponse.length > 0) {
+            setCurrentTVShow(searchResponse[0]);
+        }
+    }
+
     return (
         <div
             className={s.main_container}
@@ -48,16 +60,14 @@ export function App() {
             <div className={s.header}>
                 <div className="row">
                     <div className="col-4">
-                        <div>
-                            <Logo
-                                image={logo}
-                                title="Watowatch"
-                                subtitle="Find a show you may like"
-                            />
-                        </div>
+                        <Logo
+                            image={logo}
+                            title="Watowatch"
+                            subtitle="Find a show you may like"
+                        />
                     </div>
                     <div className="col-sm-12 col-md-4">
-                        <input type="text" style={{ width: "100%" }} />
+                        <SearchBar onSubmit={SearchTvShow} />
                     </div>
                 </div>
             </div>
